@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    /* Responsive Flexbox Layout */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    .banking-card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px; /* Responsive limit */
+    }
+
+    h1 { font-size: 42px; margin-bottom: 20px; }
+    
+    label { display: block; text-align: left; font-size: 24px; margin-bottom: 10px; }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 18px;
+      box-sizing: border-box;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px; /* Spacing between buttons */
+    }
+
+    button {
+      flex: 1; /* Makes buttons equal width */
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .deposit { background-color: #1d61ff; }
+    .withdraw { background-color: #ef4437; }
+
+    #error-msg { color: #ef4437; font-size: 28px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="banking-card">
+    <h1>Balance: $<span id="balance">1000</span></h1>
+    
+    <label>Amount</label>
+    <input type="number" id="amountInput">
+
+    <div class="btn-group">
+      <button class="deposit" onclick="handleTransaction('deposit')">Deposit</button>
+      <button class="withdraw" onclick="handleTransaction('withdraw')">Withdraw</button>
+    </div>
+
+    <p id="error-msg"></p>
+  </div>
+
+  <script>
+    let currentBalance = 1000;
+
+    function handleTransaction(type) {
+      const input = document.getElementById('amountInput');
+      const amount = parseFloat(input.value);
+      const errorField = document.getElementById('error-msg');
+      
+      // Validation
+      if (isNaN(amount) || amount <= 0) {
+        errorField.innerText = "Invalid amount!";
+        return;
+      }
+
+      if (type === 'deposit') {
+        currentBalance += amount;
+        errorField.innerText = ""; // Clear error
+      } else if (type === 'withdraw') {
+        if (amount > currentBalance) {
+          errorField.innerText = "Insufficient funds!";
+          return;
+        }
+        currentBalance -= amount;
+        errorField.innerText = "";
+      }
+
+      // Update UI
+      document.getElementById('balance').innerText = currentBalance;
+      input.value = ""; // Clear input box
+    }
+  </script>
+
+</body>
+</html>
