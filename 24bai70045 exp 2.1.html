@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment 1.4: Live Character Counter</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* --- CSS STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a; /* Dark Blue Background */
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .counter-box {
+            background-color: #1e293b; /* Card Background */
+            padding: 20px;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .text-input {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-size: 1.2rem;
+            outline: none;
+            resize: none;
+        }
+
+        .text-input::placeholder {
+            color: #64748b;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .count {
+            font-size: 1rem;
+            color: #94a3b8;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        /* Warning Color (Red) */
+        .count.warning {
+            color: #ef4444;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background-color: #3b82f6; /* Blue */
+            transition: width 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const CharacterCounter = () => {
+            const [text, setText] = useState('');
+            const maxChars = 150;
+
+            const handleChange = (e) => {
+                const val = e.target.value;
+                if (val.length <= maxChars) {
+                    setText(val);
+                }
+            };
+
+            // Calculate percentage for progress bar
+            const percentage = (text.length / maxChars) * 100;
+            
+            // Check if near limit (90%)
+            const isNearLimit = percentage > 90;
+
+            return (
+                <div className="app-container">
+                    <div className="counter-box">
+                        <textarea
+                            className="text-input"
+                            rows="4"
+                            placeholder="Type your message..."
+                            value={text}
+                            onChange={handleChange}
+                        />
+                        
+                        <div className="footer">
+                            <span className={`count ${isNearLimit ? 'warning' : ''}`}>
+                                {text.length}/{maxChars}
+                            </span>
+                        </div>
+
+                        {/* Blue Progress Bar at bottom */}
+                        <div 
+                            className="progress-bar" 
+                            style={{ width: `${percentage}%` }}
+                        ></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CharacterCounter />);
+    </script>
+
+</body>
+</html>

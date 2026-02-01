@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Drawing Tool</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Destructure hooks from the global React object
+        const { useState, useRef } = React;
+
+        const SvgDrawingTool = () => {
+            // --- State Management ---
+            const [circles, setCircles] = useState([]);
+            const [selectedColor, setSelectedColor] = useState('#2563eb'); // Default Blue
+            const svgRef = useRef(null);
+
+            // --- Event Handlers ---
+            
+            // 1. Handle Drawing
+            const handleCanvasClick = (e) => {
+                const svg = svgRef.current;
+                if (!svg) return;
+
+                // Calculate mouse position relative to the SVG canvas
+                const rect = svg.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const newCircle = { id: Date.now(), x, y, color: selectedColor };
+                setCircles([...circles, newCircle]);
+            };
+
+            // 2. Handle Undo
+            const handleUndo = () => {
+                setCircles(prev => prev.slice(0, -1));
+            };
+
+            // --- Styles Object ---
+            const styles = {
+                container: {
+                    fontFamily: "'Segoe UI', sans-serif",
+                    backgroundColor: '#f3f4f6',
+                    minHeight: '100vh',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '20px',
+                },
+                card: {
+                    backgroundColor: '#ffffff',
+                    borderRadius: '16px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+                    padding: '30px',
+                    width: '100%',
+                    maxWidth: '500px',
+                    textAlign: 'center',
+                },
+                controls: {
+                    display: 'flex',
+                    gap: '10px',
+                    marginBottom: '20px',
+                    alignItems: 'center',
+                },
+                colorInputWrapper: {
+                    position: 'relative',
+                    width: '40px',
+                    height: '40px',
+                    overflow: 'hidden',
+                    borderRadius: '8px',
+                    border: '1px solid #e5e7eb',
+                    cursor: 'pointer',
+                },
+                colorInput: {
+                    position: 'absolute',
+                    top: '-50%',
+                    left: '-50%',
+                    width: '200%',
+                    height: '200%',
+                    cursor: 'pointer',
+                    border: 'none',
+                    padding: 0,
+                },
+                undoButton: {
+                    backgroundColor: '#2563eb',
+                    color: 'white',
+                    border: 'none',
+                    padding: '10px 24px',
+                    borderRadius: '8px',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                    opacity: circles.length === 0 ? 0.5 : 1, // Visual feedback for disabled state
+                    pointerEvents: circles.length === 0 ? 'none' : 'auto'
+                },
+                canvasContainer: {
+                    border: '2px dashed #e5e7eb',
+                    borderRadius: '8px',
+                    height: '350px',
+                    width: '100%',
+                    position: 'relative',
+                    marginBottom: '20px',
+                    cursor: 'crosshair',
+                    backgroundColor: '#fafafa',
+                    display: 'block' // Ensures SVG behaves correctly
+                },
+                footerText: {
+                    fontSize: '1.5rem',
+                    color: '#374151',
+                    margin: 0,
+                },
+            };
+
+            return (
+                <div style={styles.container}>
+                    <div style={styles.card}>
+                        
+                        {/* Controls: Color Picker & Undo */}
+                        <div style={styles.controls}>
+                            <div style={styles.colorInputWrapper} title="Choose Color">
+                                <input 
+                                    type="color" 
+                                    value={selectedColor}
+                                    onChange={(e) => setSelectedColor(e.target.value)}
+                                    style={styles.colorInput}
+                                />
+                            </div>
+                            
+                            <button 
+                                style={styles.undoButton} 
+                                onClick={handleUndo}
+                                disabled={circles.length === 0}
+                            >
+                                Undo
+                            </button>
+                        </div>
+
+                        {/* SVG Canvas */}
+                        <svg 
+                            ref={svgRef}
+                            style={styles.canvasContainer}
+                            onClick={handleCanvasClick}
+                        >
+                            {circles.map((circle) => (
+                                <circle
+                                    key={circle.id}
+                                    cx={circle.x}
+                                    cy={circle.y}
+                                    r="12"
+                                    fill={circle.color}
+                                />
+                            ))}
+                        </svg>
+
+                        {/* Footer Info */}
+                        <h2 style={styles.footerText}>
+                            Circles drawn: {circles.length}
+                        </h2>
+
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Mount the Application ---
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SvgDrawingTool />);
+    </script>
+</body>
+</html>
